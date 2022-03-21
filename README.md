@@ -7,12 +7,15 @@ Small project part of an interview process for Quanticko Technologies.
 I will be doing a baseline.py where i can rapidly prototype a working system.
 
 For this i will engulf into reading the given [documentation](https://docs.ccxt.com/en/latest/).
-https://github.com/ccxt/ccxt/wiki/FAQ
 
 
 After that i will refactor that into OOP.
 
 I also plan to define the class system with an UML diagram.
+
+## TO-DO
+
+
 
 
 ## Objects
@@ -20,7 +23,7 @@ I also plan to define the class system with an UML diagram.
 * Coin?
 * ...
 
-## Preguntas
+## Links Útiles
 
-* ¿"En cada instante de tiempo t:", se puede abstraer a cada request?
-* ¿"Implementar un algoritmo..." puede ser una API?
+* https://github.com/ccxt/ccxt/blob/master/examples/py
+  
