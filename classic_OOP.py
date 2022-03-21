@@ -14,16 +14,26 @@ class Coins(str, Enum):
     BNB = 'BNB'
 
 class Coin:
-    def __init__(self, name: Coins):
+    def __init__(self, name: Coins, exchange: ccxt.Exchange):
         self.name = name
+        self.exchange = exchange
         
     def __str__(self):
         return str.upper(self.name)
+    
+    def get_bid_price(self):
+        pass
+    
+    def get_ask_price(self):
+        pass
 
 class Ticker:
     pass
 
+class Ratios:
+    pass
 
 if __name__ == '__main__':
-    print(Coin("BTC"))
+    binance = ccxt.binance()
+    print(Coin("BTC", binance))
     pass
