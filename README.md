@@ -32,8 +32,8 @@ class Coins(str, Enum):
 ```python
 class Ticker:
     """
-    From this class is that we extract & display the requested fata.
-    Much of its inner mechanisms are to handle concurrent request to the binance exchange API.
+    From this class is that we extract & display the requested data.
+    Much of its inner mechanisms are to handle concurrent requests to the binance exchange API.
     """
     async def run_loops(self, asyncio_loop: AbstractEventLoop):
         

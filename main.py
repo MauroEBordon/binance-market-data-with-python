@@ -1,4 +1,3 @@
-import time
 import ccxt.async_support as ccxt 
 from asyncio import gather, get_event_loop, AbstractEventLoop
 from enum import Enum
