@@ -5,6 +5,10 @@ from enum import Enum
 from typing import List
 
 class Coins(str, Enum):
+    """
+    "Enumerated" class to define the "domain" (the selected cryptos in the exercice)
+    it has the advantage to use strings as the alphabet in the "enumeration".
+    """
     BTC = 'BTC'
     ETH = 'ETH'
     ADA = 'ADA'
@@ -35,7 +39,10 @@ class Coins(str, Enum):
         return coin
 
 class Ticker:
-    
+    """
+    From this class is that we extract & display the requested fata.
+    Much of its inner mechanisms are to handle concurrent request to the binance exchange API.
+    """
     def __init__(self, c1: Coins, c2: Coins, exchange_id='binance'):
         self.c1 = f'{c1.name}/USDT'
         self.c2 = f'{c2.name}/USDT'
