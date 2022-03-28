@@ -37,7 +37,7 @@ class Ticker:
     """
     async def run_loops(self, asyncio_loop: AbstractEventLoop):
         
-    async def exchange_loop(self, 
+    async def exchange_loop(self, asyncio_loop: AbstractEventLoop, symbols: List[str]):
            
     async def get_prices_loop(self, symbol: str):
 ```
