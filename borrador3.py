@@ -1,17 +1,17 @@
 import asyncio
 from binance import AsyncClient, BinanceSocketManager
 
-
 async def main():
     client = await AsyncClient.create()
-    bm = BinanceSocketManager(client)
+    bm = BinanceSocketManager(client, user_timeout=60)
     # start any sockets here, i.e a trade socket
-    ts = bm.trade_socket('BNBBTC')
+    ts = bm.multiplex_socket(['ethusdt@ticker', 'btcusdt@ticker'])
     # then start receiving messages
     async with ts as tscm:
         while True:
             res = await tscm.recv()
-            print(res)
+            info = res["data"]
+            print(info["b"], info["a"])
 
     await client.close_connection()
 

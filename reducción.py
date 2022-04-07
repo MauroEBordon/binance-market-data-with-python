@@ -48,33 +48,31 @@ class Ticker:
         self.symbol = f'{c1.name}/{c2.name}'
         
     def show_info(self, exchange: ccxt.Exchange):
-        """Infinitely shows the info asked by the exercice by fetching data from an exchange
+        """Shows the info asked by the exercice by fetching data from an exchange
         """
-        while True:
-            asks = []
-            bids = []
-            now = None
+        asks = []
+        bids = []
+        now = None
+        
+        #this loop fetches the bid & ask price for each coin
+        for coin in self.coins:
+            try:
+                info = exchange.fetch_ticker(coin)
+                now = info["datetime"]
+                asks += [info["ask"]]
+                bids += [info["bid"]]
+            except Exception as e:
+                #print(f'exception error: {str(e)}')
+                break 
+        
+        print(f'''            -----------------------------------
+            Date/Time: {now} 
+            Exchange: {str.upper(exchange.id)}
+            Ticker Cryptos: {self.symbol}
+            Ratio1: {bids[0]/asks[1]:.6f}
+            Ratio2: {bids[1]/asks[0]:.6f}             
+            ''')
             
-            #this loop fetches the bid & ask price for each coin
-            for coin in self.coins:
-                try:
-                    info = exchange.fetch_ticker(coin)
-                    now = info["datetime"]
-                    asks += [info["ask"]]
-                    bids += [info["bid"]]
-                except Exception as e:
-                    #print(f'exception error: {str(e)}')
-                    break 
-            
-            print(f'''                -----------------------------------
-                Date/Time: {now} 
-                Exchange: {str.upper(exchange.id)}
-                Ticker Cryptos: {self.symbol}
-                Ratio1: {bids[0]/asks[1]:.6f}
-                Ratio2: {bids[1]/asks[0]:.6f}             
-                ''')
-            
-
 if __name__ == '__main__':
     
     #Instancing a binance ccxt.Exchange object 
@@ -87,8 +85,9 @@ if __name__ == '__main__':
     #We create our ticker instace
     ticker = Ticker(c1, c2)
     
-    #fetch & display the ratio between coins
-    ticker.show_info(binance)
+    while True:
+        #fetch & display the ratio between coins
+        ticker.show_info(binance)
 
         
     
