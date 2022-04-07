@@ -4,25 +4,27 @@ Small project part of an interview process for Quanticko Technologies.
 
 ## Requirements
 
-* Python 3.6 or newer
-* ccxt & ccxtpro
-* asyncio
-* python-binance
+* `Python 3.6` or newer
+* `ccxt` 
+* `asyncio`
+* either `python-binance` or `binance-connector` (they can't coexist in the same enviroment)
 * Internet Connection
 
 
 ## Useful documentation
-* https://github.com/ccxt/ccxt/blob/master/examples/py
-    * async-fetch-many-orderbooks-continuously.py
-    * async-binance-fetch-ticker-continuously.py
-* ~~https://github.com/ccxt/ccxt/wiki/ccxt.pro.manual#~~
-* https://github.com/ccxt/ccxt/blob/b9f5441a44e740579c9274f84487b6ba7da8e107/examples/ccxt.pro/py/binance-futures-watch-order-book.py
-* https://python-binance.readthedocs.io/en/latest/websockets.html#binancesocketmanager-websocket-usage
-* [Binance API docs](https://binance-docs.github.io/apidocs/spot/en/#individual-symbol-ticker-streams)
 
-* https://websockets.readthedocs.io/en/stable/
+* ### For `ccxtpro` I followed this:
+    * Manual (https://github.com/ccxt/ccxt/wiki/ccxt.pro.manual#)
+    * Watch ticker python example (https://github.com/ccxt/ccxt/blob/b9f5441a44e740579c9274f84487b6ba7da8e107/examples/ccxt.pro/py/binance-futures-watch-order-book.py)  
+      
+  
+* ### For the main websocket implementation `ws.py`:  
+    * [python-binance module documentation](https://python-binance.readthedocs.io/en/latest/websockets.html#binancesocketmanager-websocket-usage)
+    * [Binance API docs](https://binance-docs.github.io/apidocs/spot/en/#individual-symbol-ticker-streams)  
 
-* https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md
-
-* https://github.com/binance/binance-connector-python
-    * r/examples/websocket/spot/symbol_ticker.py
+  
+* ### For `ws_connector.py`:
+    I started using the [Binance documentation for websockets](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md) but i stumbled uopen a library that works as a connector to the [Binance Public API](https://github.com/binance/binance-spot-api-docs):
+    
+    * [binance-connector module documentation](https://github.com/binance/binance-connector-python)
+        * special mention to: [`examples/websocket/spot/symbol_ticker.py`](https://github.com/binance/binance-connector-python/blob/master/examples/websocket/spot/symbol_ticker.py)

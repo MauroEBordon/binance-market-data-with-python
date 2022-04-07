@@ -1,6 +1,8 @@
-import asyncio
+from datetime import datetime
 import time
-import os
+import logging
+
+from binance.lib.utils import config_logging
 from binance.websocket.spot.websocket_client import SpotWebsocketClient as Client
 
 from enum import Enum
@@ -43,43 +45,52 @@ class Ticker:
         self.c1 = f'{str.lower(c1.name)}usdt@ticker'
         self.c2 = f'{str.lower(c2.name)}usdt@ticker'
         self.coins = [self.c1, self.c2]
-        self.symbol = f'{c1.name}{c2.name}'
-        self.bid1 = 1
-        self.bid2 = 1
+        self.symbol = f'{c1.name}/{c2.name}'
+        self.bid1 = 0
+        self.bid2 = 0
         self.ask1 = 1
         self.ask2 = 1
-        self.ratio1 = 1
-        self.ratio2 = 1
+
         
-    def data_handler(self, message):
-        print(message)
+    def data_handler(self, res):
         
+        try:
+            now = datetime.fromtimestamp(res["data"]["E"]//1000)
+            bid = float(res["data"]["b"])
+            ask = float(res["data"]["a"])
+            if res["stream"] == self.c1 and self.bid1 == bid and self.ask1 == ask:
+                return
+            if res["stream"] == self.c2 and self.bid2 == bid and self.ask2 == ask:
+                return
 
+            if res["stream"] == self.c1:
+                self.bid1 = bid
+                self.ask1 = ask
 
-        #print(bid)
-        #print(ask)
-        #print(self.bid1, self.bid2, self.ask1, self.ask2)
+            elif res["stream"] == self.c2:
+                self.bid2 = bid
+                self.ask2 = ask    
 
-        #time.sleep(2)
-        # print("Date/Time: ")
-        #print("Exchange: Binance")
-        #print(f"Ticker Cryptos: {self.symbol}")
-        #os.sleep(2)
-        #print(f"Ratio 2: {self.bid2:.6f}")
-        
-#         print(f'''-----------------------------------
-# Date/Time:  
-# Exchange: Binance
-# Ticker Cryptos: {self.symbol}
-# Ratio1: {self.bid1/self.ask2:.6f}
-# Ratio2: {self.bid2/self.ask1:.6f}             
-# ''')
-
-
-
+            if self.bid1 == 0 or self.bid2 == 0:
+                return
+            
+            print("\033[H\033[J", end="")
+            print(f'''-----------------------------------
+Date/Time: {now}
+Exchange: Binance
+Ticker Cryptos: {self.symbol}
+Ratio1: {self.bid1/self.ask2:.6f}
+Ratio2: {self.bid2/self.ask1:.6f}      
+-----------------------------------     
+''')
+            
+        except Exception as e:
+            print(e)
 
 
 if __name__ == '__main__':
+    
+    config_logging(logging, logging.DEBUG)
     
     binance = Client(stream_url="wss://testnet.binance.vision")
     
@@ -92,16 +103,12 @@ if __name__ == '__main__':
     
     binance.start()
     
-    binance.ticker(
-        symbol=ticker.symbol,
-        id=1,
-        callback=ticker.data_handler
-    )
-
+    
     binance.instant_subscribe(
     ticker.coins, callback=ticker.data_handler
 )
-    time.sleep(2000)
+    while True:
+        pass
     
     binance.stop()
     
