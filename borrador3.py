@@ -3,7 +3,7 @@ from binance import AsyncClient, BinanceSocketManager
 
 async def main():
     client = await AsyncClient.create()
-    bm = BinanceSocketManager(client, user_timeout=60)
+    bm = BinanceSocketManager(client, user_timeout=10)
     # start any sockets here, i.e a trade socket
     ts = bm.multiplex_socket(['ethusdt@ticker', 'btcusdt@ticker'])
     # then start receiving messages

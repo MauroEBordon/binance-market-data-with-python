@@ -1,4 +1,6 @@
 import asyncio
+import time
+import os
 from binance import AsyncClient, BinanceSocketManager
 
 from enum import Enum
@@ -38,50 +40,64 @@ class Ticker:
     """This class handles the data extraction & the display of the asked information
     """
     def __init__(self, c1: Coins, c2: Coins):
-        self.c1 = f'{c1.name}/USDT'
-        self.c2 = f'{c2.name}/USDT'
+        self.c1 = f'{str.lower(c1.name)}usdt@ticker'
+        self.c2 = f'{str.lower(c2.name)}usdt@ticker'
         self.coins = [self.c1, self.c2]
-        self.symbol = f'{c1.name}{c2.name}'
+        self.symbol = f'{c1.name}/{c2.name}'
+        self.bid1 = 1
+        self.bid2 = 1
+        self.ask1 = 1
+        self.ask2 = 1
+        self.ratio1 = 1
+        self.ratio2 = 1
         
     async def show_info(self, trade_socket):
-        """Infinitely shows the info asked by the exercice by fetching data from an exchange
+        """Shows the info asked by the exercice by fetching data from an exchange
         """
-        # if not exchange.has['watchOrderBook']:
-        #     print("este exchange no soporta websockets")
-        #     return
-        
         res = await trade_socket.recv()
-        print(res)
-        # while True:
-        #     asks = []
-        #     bids = []
-        #     now = None
-            
-        #     #this loop fetches the bid & ask price for each coin
-        #     for coin in self.coins:
-        #         try:
-        #             info = await exchange.watch_order_book(coin)
-        #             now = info["datetime"]
-        #             asks += [info['asks'][0]]
-        #             bids += [info['bids'][0]]
-        #         except Exception as e:
-        #             #print(f'exception error: {str(e)}')
-        #             break 
-            
-        #     print(f'''                -----------------------------------
-        #         Date/Time: {now} 
-        #         Exchange: {str.upper(exchange.id)}
-        #         Ticker Cryptos: {self.symbol}
-        #         Ratio1: {bids[0]/asks[1]:.6f}
-        #         Ratio2: {bids[1]/asks[0]:.6f}             
-        #         ''')
-        # await exchange.close()
-        
 
-async def main():
+        bid = res["data"]["b"]
+        ask = res["data"]["a"] 
+        if res["stream"] == self.c1 and self.bid1 == bid and self.ask1 == ask:
+            return
+        if res["stream"] == self.c2 and self.bid2 == bid and self.ask2 == ask:
+            return
+
+        if res["stream"] == self.c1:
+            self.ratio1 = await bid/self.ask2
+            self.bid1 = bid
+            self.ask1 = ask
+
+        elif res["stream"] == self.c2:
+            #print(f"Ratio 2: {self.bid1/ask:.6f}")
+            self.ratio2 = await self.bid1/ask
+            self.bid2 = bid
+            self.ask2 = ask    
+
+        #print(bid)
+        #print(ask)
+        #print(self.bid1, self.bid2, self.ask1, self.ask2)
+
+        #time.sleep(2)
+        # print("Date/Time: ")
+        #print("Exchange: Binance")
+        #print(f"Ticker Cryptos: {self.symbol}")
+        #os.sleep(2)
+        #print(f"Ratio 2: {self.bid2:.6f}")
+        
+#         print(f'''-----------------------------------
+# Date/Time:  
+# Exchange: Binance
+# Ticker Cryptos: {self.symbol}
+# Ratio1: {self.bid1/self.ask2:.6f}
+# Ratio2: {self.bid2/self.ask1:.6f}             
+# ''')
+
+
+async def main(loop):
     
     client = await AsyncClient.create()
-    binance = BinanceSocketManager(client)
+    binance = BinanceSocketManager(client, user_timeout=10)
     
     #Asking the user for this choice of coins
     c1 = Coins.coin_from_input()
@@ -91,7 +107,7 @@ async def main():
     ticker = Ticker(c1, c2)
     
     #create our socket
-    trade_socket = binance.trade_socket(ticker.symbol)
+    trade_socket = binance.multiplex_socket(ticker.coins)
     
     async with trade_socket as tscm:
         while True:
@@ -100,6 +116,7 @@ async def main():
             except Exception as e:
                 #print(f'exception error: {str(e)}')
                 break 
+
     
     await client.close_connection()
 
@@ -107,7 +124,7 @@ if __name__ == '__main__':
     
     #we create an eventloop 
     loop = asyncio.new_event_loop()
-    loop.run_until_complete(main())
+    loop.run_until_complete(main(loop))
     
 
     
