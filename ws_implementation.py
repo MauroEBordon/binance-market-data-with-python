@@ -1,7 +1,7 @@
 import asyncio
 import time
 import os
-from binance import AsyncClient, BinanceSocketManager
+from binance.websocket.spot.websocket_client import SpotWebsocketClient as Client
 
 from enum import Enum
     
@@ -43,7 +43,7 @@ class Ticker:
         self.c1 = f'{str.lower(c1.name)}usdt@ticker'
         self.c2 = f'{str.lower(c2.name)}usdt@ticker'
         self.coins = [self.c1, self.c2]
-        self.symbol = f'{c1.name}/{c2.name}'
+        self.symbol = f'{c1.name}{c2.name}'
         self.bid1 = 1
         self.bid2 = 1
         self.ask1 = 1
@@ -51,28 +51,10 @@ class Ticker:
         self.ratio1 = 1
         self.ratio2 = 1
         
-    async def show_info(self, trade_socket):
-        """Shows the info asked by the exercice by fetching data from an exchange
-        """
-        res = await trade_socket.recv()
+    def data_handler(self, message):
+        print(message)
+        
 
-        bid = res["data"]["b"]
-        ask = res["data"]["a"] 
-        if res["stream"] == self.c1 and self.bid1 == bid and self.ask1 == ask:
-            return
-        if res["stream"] == self.c2 and self.bid2 == bid and self.ask2 == ask:
-            return
-
-        if res["stream"] == self.c1:
-            self.ratio1 = await bid/self.ask2
-            self.bid1 = bid
-            self.ask1 = ask
-
-        elif res["stream"] == self.c2:
-            #print(f"Ratio 2: {self.bid1/ask:.6f}")
-            self.ratio2 = await self.bid1/ask
-            self.bid2 = bid
-            self.ask2 = ask    
 
         #print(bid)
         #print(ask)
@@ -94,10 +76,12 @@ class Ticker:
 # ''')
 
 
-async def main(loop):
+
+
+
+if __name__ == '__main__':
     
-    client = await AsyncClient.create()
-    binance = BinanceSocketManager(client, user_timeout=10)
+    binance = Client(stream_url="wss://testnet.binance.vision")
     
     #Asking the user for this choice of coins
     c1 = Coins.coin_from_input()
@@ -106,27 +90,20 @@ async def main(loop):
     #We create our ticker instace
     ticker = Ticker(c1, c2)
     
-    #create our socket
-    trade_socket = binance.multiplex_socket(ticker.coins)
+    binance.start()
     
-    async with trade_socket as tscm:
-        while True:
-            try:
-                await ticker.show_info(tscm)
-            except Exception as e:
-                #print(f'exception error: {str(e)}')
-                break 
+    binance.ticker(
+        symbol=ticker.symbol,
+        id=1,
+        callback=ticker.data_handler
+    )
 
+    binance.instant_subscribe(
+    ticker.coins, callback=ticker.data_handler
+)
+    time.sleep(2000)
     
-    await client.close_connection()
-
-if __name__ == '__main__':
-    
-    #we create an eventloop 
-    loop = asyncio.new_event_loop()
-    loop.run_until_complete(main(loop))
-    
-
+    binance.stop()
     
 
 
