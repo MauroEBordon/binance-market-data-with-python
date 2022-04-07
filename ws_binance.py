@@ -2,12 +2,6 @@ from datetime import datetime
 import time
 import logging
 
-
-#desarrollar con legibilidad y simplicidad.
-#pensarlo al revez, como alguien que no tiene el enunciado del problema
-#para competencia de comprencion
-
-
 from binance.lib.utils import config_logging
 from binance.websocket.spot.websocket_client import SpotWebsocketClient as Client
 
@@ -45,7 +39,7 @@ Returns:
         return coin
 
 class Ticker:
-    """This class handles the data extraction & the display of the asked information
+    """This class handles the data extraction & the display of the target information
     """
     def __init__(self, c1: Coins, c2: Coins):
         self.c1 = f'{str.lower(c1.name)}usdt@ticker'
@@ -59,27 +53,34 @@ class Ticker:
 
         
     def data_handler(self, res):
-        
+        """Here we select the target information and check and refresh our system if there is a new value 
+        """
         try:
-            now = datetime.fromtimestamp(res["data"]["E"]//1000)
+            #translate the timestamp to an actual date
+            now = datetime.fromtimestamp(res["data"]["E"]//1000) #this converts milliseconds to seconds
+            
             bid = float(res["data"]["b"])
             ask = float(res["data"]["a"])
+            
+            #if the data is actually the same, we dont need to show anything
             if res["stream"] == self.c1 and self.bid1 == bid and self.ask1 == ask:
                 return
             if res["stream"] == self.c2 and self.bid2 == bid and self.ask2 == ask:
                 return
 
+            #refresh price values
             if res["stream"] == self.c1:
                 self.bid1 = bid
                 self.ask1 = ask
-
             elif res["stream"] == self.c2:
                 self.bid2 = bid
                 self.ask2 = ask    
 
+            #we wont show info until we can fetch data from both streams
             if self.bid1 == 0 or self.bid2 == 0:
                 return
             
+            #finally printing
             print("\033[H\033[J", end="")
             print(f'''-----------------------------------
 Date/Time: {now}
@@ -98,7 +99,9 @@ if __name__ == '__main__':
     
     config_logging(logging, logging.DEBUG)
     
+    #the instanciate the binance client
     binance = Client(stream_url="wss://testnet.binance.vision")
+    binance.start()
     
     #Asking the user for this choice of coins
     c1 = Coins.coin_from_input()
@@ -107,12 +110,10 @@ if __name__ == '__main__':
     #We create our ticker instace
     ticker = Ticker(c1, c2)
     
-    binance.start()
+    #we subscribe the the multiplex socket for each coin's stream
+    binance.instant_subscribe(ticker.coins, callback=ticker.data_handler)
     
-    
-    binance.instant_subscribe(
-    ticker.coins, callback=ticker.data_handler
-)
+    #to make
     while True:
         pass
     

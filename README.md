@@ -10,22 +10,38 @@ Small project part of an interview process for Quanticko Technologies.
 * either `python-binance` or `binance-connector` (they can't coexist in the same enviroment)
 * Internet Connection
 
-## Special Mention
 
-the `ws.py` & `ws_connector.py` implementations have incompatible libraries.
+## How to run
+
+* Run this on the repo directory:
+```bash
+pip install -r requirements.txt
+```
+
+* the `ws.py` & `ws_binance.py` implementations have incompatible libraries.
 To avoid this you should either run:
-```shell
+```bash
+pip uninstall python-binance; pip install binance-connector
+python3 ws_binance.py
+```  
+
+or
+```bash
 pip uninstall binance-connector; pip install python-binance
 python3 ws.py
 ```  
-or
 
-```shell
-pip uninstall python-binance; pip install binance-connector
-python3 ws_connector.py
-```  
+## Implementations
 
-there's also an implementation using
+## `reduction.py`
+the simpler & most straight foward implementation
+
+## `ws.py`
+Asyncronic implementation using `BinanceSocketManager` to connect to binance streams.
+It only refresh the displayed data when theres a change in a coin's price.
+
+## `ws_binance.py`
+Stright foward implementation using Binance's own connector module.
 
 ## Useful documentation 
   
@@ -34,7 +50,7 @@ there's also an implementation using
     * [Binance API docs](https://binance-docs.github.io/apidocs/spot/en/#individual-symbol-ticker-streams)  
 
   
-* ### For `ws_connector.py`:
+* ### For `ws_binance.py`:
     I started using the [Binance documentation for websockets](https://github.com/binance/binance-spot-api-docs/blob/master/web-socket-streams.md) but i stumbled uopen a library that works as a connector to the [Binance Public API](https://github.com/binance/binance-spot-api-docs):
     
     * [binance-connector module documentation](https://github.com/binance/binance-connector-python)

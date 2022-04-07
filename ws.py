@@ -59,28 +59,31 @@ class Ticker:
         """
         res = await trade_socket.recv()
         
-        now = datetime.fromtimestamp(res["data"]["E"]//1000)
+        #translate the timestamp to an actual date
+        now = datetime.fromtimestamp(res["data"]["E"]//1000) #this converts milliseconds to seconds
+        
         bid = float(res["data"]["b"])
         ask = float(res["data"]["a"]) 
+        
+        #if the data is actually the same, we dont need to show anything
         if res["stream"] == self.c1 and self.bid1 == bid and self.ask1 == ask:
             return
         if res["stream"] == self.c2 and self.bid2 == bid and self.ask2 == ask:
             return
 
+        #refresh price values
         if res["stream"] == self.c1:
             self.bid1 = bid
             self.ask1 = ask
-
         elif res["stream"] == self.c2:
-            #print(f"Ratio 2: {self.bid1/ask:.6f}")
             self.bid2 = bid
             self.ask2 = ask    
         
-
+        #we wont show info until we can fetch data from both streams
         if self.bid1 == 0 or self.bid2 == 0:
                 return
             
-        print("\033[H\033[J", end="")
+        print("\033[H\033[J", end="") #clears the console
         print(f'''-----------------------------------
 Date/Time: {now}
 Exchange: Binance

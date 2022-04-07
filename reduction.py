@@ -54,23 +54,24 @@ class Ticker:
             try:
                 info = exchange.fetch_ticker(coin)
                 now = info["datetime"]
-                asks += [info["ask"]]
-                bids += [info["bid"]]
+                asks += [info["ask"]] # sintax sugar for list appendation
+                bids += [info["bid"]] 
             except Exception as e:
-                #print(f'exception error: {str(e)}')
-                break 
+                print(f'Exception error: {str(e)}')
+                return
         
-        print(f'''            -----------------------------------
-            Date/Time: {now} 
-            Exchange: {str.upper(exchange.id)}
-            Ticker Cryptos: {self.symbol}
-            Ratio1: {bids[0]/asks[1]:.6f}
-            Ratio2: {bids[1]/asks[0]:.6f}             
-            ''')
+        print("\033[H\033[J", end="") #clears the console
+        print(f'''-----------------------------------
+Date/Time: {now} 
+Exchange: {str.upper(exchange.id)}
+Ticker Cryptos: {self.symbol}
+Ratio1: {bids[0]/asks[1]:.6f}
+Ratio2: {bids[1]/asks[0]:.6f}             
+''')
             
 if __name__ == '__main__':
     
-    #Instancing a binance ccxt.Exchange object 
+    #we instanciate the binance exchange client
     binance = ccxt.binance()
     
     #Asking the user for this choice of coins
