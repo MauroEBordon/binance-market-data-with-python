@@ -2,6 +2,12 @@ from datetime import datetime
 import time
 import logging
 
+
+#desarrollar con legibilidad y simplicidad.
+#pensarlo al revez, como alguien que no tiene el enunciado del problema
+#para competencia de comprencion
+
+
 from binance.lib.utils import config_logging
 from binance.websocket.spot.websocket_client import SpotWebsocketClient as Client
 

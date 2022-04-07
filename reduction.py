@@ -2,11 +2,6 @@ import ccxt
 from enum import Enum
 from typing import List
 
-#sacarle la concurrencia
-#desarrollar con legibilidad y simplicidad.
-#pensarlo al revez, como alguien que no tiene el enunciado del problema
-#para competencia de comprencion
-
 class Coins(str, Enum):
     """Enumerated class to filter the selected cryptos in the exercice.
 It has the advantage to use strings as the alphabet in the "enumeration".

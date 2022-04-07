@@ -1,10 +1,15 @@
 import asyncio
-import time
-import os
+from datetime import datetime
 from binance import AsyncClient, BinanceSocketManager
 
 from enum import Enum
     
+
+#desarrollar con legibilidad y simplicidad.
+#pensarlo al revez, como alguien que no tiene el enunciado del problema
+#para competencia de comprencion
+
+
 class Coins(str, Enum):
     """Enumerated class to filter the selected cryptos in the exercice.
 It has the advantage to use strings as the alphabet in the "enumeration".
@@ -53,7 +58,8 @@ class Ticker:
         """Shows the info only when there has been a change on bid or ask price of any of it's coins
         """
         res = await trade_socket.recv()
-
+        
+        now = datetime.fromtimestamp(res["data"]["E"]//1000)
         bid = float(res["data"]["b"])
         ask = float(res["data"]["a"]) 
         if res["stream"] == self.c1 and self.bid1 == bid and self.ask1 == ask:
@@ -70,12 +76,18 @@ class Ticker:
             self.bid2 = bid
             self.ask2 = ask    
         
+
+        if self.bid1 == 0 or self.bid2 == 0:
+                return
+            
+        print("\033[H\033[J", end="")
         print(f'''-----------------------------------
-Date/Time:  
+Date/Time: {now}
 Exchange: Binance
 Ticker Cryptos: {self.symbol}
 Ratio1: {self.bid1/self.ask2:.6f}
-Ratio2: {self.bid2/self.ask1:.6f}             
+Ratio2: {self.bid2/self.ask1:.6f}      
+-----------------------------------     
 ''')
 
 
