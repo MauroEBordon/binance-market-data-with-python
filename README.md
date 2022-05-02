@@ -1,6 +1,6 @@
-# binance-market-data-with-python
+# Binance market data with python
 
-Small project part of an interview process for Quanticko Technologies.
+Small project part of an interview process.
 
 ## Requirements
 
